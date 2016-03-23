@@ -21,8 +21,10 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    double latituda;
-    double longituda;
+  public static class globalVar{
+      public static double latituda=0;
+      public static double longituda=0;
+  }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,24 +49,14 @@ public class MainActivity extends AppCompatActivity {
         populateListView();
         //praj onclikc funkcija za sekoj item od listata
         registerClickCallback();
-
-
-
     }
 
     public class MyCurrentLoctionListener implements LocationListener{
 
         @Override
         public void onLocationChanged(Location location) {
-            latituda=location.getLatitude();
-            longituda=location.getLongitude();
-
-            String myLocation = "Latitude = " + location.getLatitude() + " Longitude = " + location.getLongitude();
-
-            //I make a log to see the results
-            TextView labela = (TextView) findViewById(R.id.textView);
-            labela.setText(myLocation);
-
+            globalVar.latituda=location.getLatitude();
+            globalVar.longituda=location.getLongitude();
         }
 
         @Override
@@ -86,9 +78,29 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void populateListView() {
-        String[] prilep = {"1555", "1573", "1595"};
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, prilep);
+        String[] brojoj= new String[]{"nemapodatok"};
+
+        //proverka na koja lokaciaj e za da popolni niza
+        if(((globalVar.latituda<41.37)&&(globalVar.latituda>41.31))&&((globalVar.longituda<21.58)&&(globalVar.longituda>21.52))){
+            brojoj = new String[]{"1555", "1573", "1595"};
+        }
+        else {
+            if ((globalVar.latituda <= 41.08 && globalVar.latituda >= 40.98) && (globalVar.longituda <= 21.38 && globalVar.longituda >= 21.28)) {
+                brojoj = new String[]{"1444", "1462", "1484"};
+            }
+            else {
+                brojoj = new String[]{"samoPrilepNekaStoj"};
+            }
+        }
+
+        String myLocation = "Latitude = " + globalVar.latituda + " Longitude = " + globalVar.longituda;
+
+        //I make a log to see the results
+        TextView labela = (TextView) findViewById(R.id.textView);
+        labela.setText(myLocation);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, brojoj);
 
         ListView list = (ListView) findViewById(R.id.listViewMain);
         list.setAdapter(adapter);
@@ -107,4 +119,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }
