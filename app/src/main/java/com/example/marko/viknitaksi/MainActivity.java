@@ -21,10 +21,8 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-  public static class globalVar{
-      public static double latituda=0;
-      public static double longituda=0;
-  }
+      static double latituda=0;
+      static double longituda=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         MyCurrentLoctionListener locationListener = new MyCurrentLoctionListener();
 
+        //proveruva permisi za gps i za android 6.0
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{
@@ -55,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onLocationChanged(Location location) {
-            globalVar.latituda=location.getLatitude();
-            globalVar.longituda=location.getLongitude();
+            latituda=location.getLatitude();
+            longituda=location.getLongitude();
         }
 
         @Override
