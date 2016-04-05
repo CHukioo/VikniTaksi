@@ -44,10 +44,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        // ja kreira i ispisuva listata
-        populateListView();
-        //praj onclikc funkcija za sekoj item od listata
-        registerClickCallback();
+            // ja kreira i ispisuva listata
+            populateListView();
+            //praj onclikc funkcija za sekoj item od listata
+            registerClickCallback();
+
     }
 
     public class MyCurrentLoctionListener implements LocationListener{
@@ -78,22 +79,25 @@ public class MainActivity extends AppCompatActivity {
 
     private void populateListView() {
 
-        String[] brojoj= new String[]{"nemapodatok"};
+        String[] brojoj= new String[]{"нема податоци"};
+        String myLocation= "Непозната позиција, не сте лоцирани!";
+        String inf;
 
         //proverka na koja lokaciaj e za da popolni niza
-        if(((globalVar.latituda<41.37)&&(globalVar.latituda>41.31))&&((globalVar.longituda<21.58)&&(globalVar.longituda>21.52))){
-            brojoj = new String[]{"1555", "1573", "1595"};
+        if(((latituda<41.37)&&(latituda>41.31))&&((longituda<21.58)&&(longituda>21.52))){
+            myLocation = "Прилеп";
+            DBHandler db = new DBHandler(this);
+            Info info = db.getInfo(myLocation);
+                brojoj = new String[]{info.getBroj()};
         }
-        else {
-            if ((globalVar.latituda <= 41.08 && globalVar.latituda >= 40.98) && (globalVar.longituda <= 21.38 && globalVar.longituda >= 21.28)) {
-                brojoj = new String[]{"1444", "1462", "1484"};
-            }
-            else {
-                brojoj = new String[]{"samoPrilepNekaStoj"};
-            }
+         if ((latituda <= 41.08 && latituda >= 40.98) && (longituda <= 21.38 && longituda >= 21.28)) {
+             myLocation = "Битола";
+             DBHandler db = new DBHandler(this);
+             Info info = db.getInfo(myLocation);
+             brojoj = new String[]{info.getBroj()};
         }
 
-        String myLocation = "Latitude = " + globalVar.latituda + " Longitude = " + globalVar.longituda;
+
 
         //I make a log to see the results
         TextView labela = (TextView) findViewById(R.id.textView);
@@ -113,10 +117,33 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View viewCliced, int position, long id) {
                 TextView textView = (TextView) viewCliced;
                 Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                callIntent.setData(Uri.parse("tel:"+textView.getText().toString()));
+                callIntent.setData(Uri.parse("tel:" + textView.getText().toString()));
                 startActivity(callIntent);
             }
         });
     }
+    public void locriajKlik(View v){
+        populateListView();
+        registerClickCallback();
+    }
 
+
+    public void vnesNaPodatoci(){
+        DBHandler db = new DBHandler(this);
+        //prvo vnesuvam deka ima bazata podatoci
+        db.addInfo(new Info("1", "1", "1", "1"));
+        //insert prilep
+        db.addInfo(new Info("100", "Прилеп", "Дени", "1595"));
+        db.addInfo(new Info("101", "Прилеп", "Милениум", "1573"));
+        db.addInfo(new Info("102", "Прилеп", "Пет", "1555"));
+        db.addInfo(new Info("103", "Прилеп", "Лион", "1577"));
+        //insert Bitola
+        db.addInfo(new Info("104", "Битола", "Цагер", "1586"));
+        db.addInfo(new Info("105", "Битола", "Теа", "1554"));
+        db.addInfo(new Info("106", "Битола", "Монгол", "1592"));
+        db.addInfo(new Info("107", "Битола", "Гонзалес", "1577"));
+        db.addInfo(new Info("108", "Битола", "Фаворит", "1591"));
+        db.addInfo(new Info("109", "Битола", "Пелфи", "1593"));
+        db.addInfo(new Info("110", "Битола", "Алфа", "1595"));
+    }
 }
