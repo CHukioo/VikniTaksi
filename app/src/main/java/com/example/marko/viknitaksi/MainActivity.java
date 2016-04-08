@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,10 +16,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,11 +52,13 @@ public class MainActivity extends AppCompatActivity {
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
             // ja kreira i ispisuva listata
-            populateListView();
+            //populateListView();
             //praj onclikc funkcija za sekoj item od listata
             registerClickCallback();
+            vnesNaPodatoci();
 
     }
+
 
     public class MyCurrentLoctionListener implements LocationListener{
 
@@ -74,42 +83,33 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
-
-
     private void populateListView() {
-
-        String[] brojoj= new String[]{"нема податоци"};
-        String myLocation= "Непозната позиција, не сте лоцирани!";
-        String inf;
+        int i = 0;
+        String myLocation = "Непозната позиција, не сте лоцирани!";
 
         //proverka na koja lokaciaj e za da popolni niza
-        if(((latituda<41.37)&&(latituda>41.31))&&((longituda<21.58)&&(longituda>21.52))){
-            myLocation = "Прилеп";
-            DBHandler db = new DBHandler(this);
-            Info info = db.getInfo(myLocation);
-                brojoj = new String[]{info.getBroj()};
+            ArrayList<String> br = null;
+            if (((latituda < 41.37) && (latituda > 41.31)) && ((longituda < 21.58) && (longituda > 21.52))) {
+                myLocation = "Прилеп";
+                DBHandler db = new DBHandler(this);
+                br = db.getBrojoj(myLocation);
+            }
+            if ((latituda <= 41.08 && latituda >= 40.98) && (longituda <= 21.38 && longituda >= 21.28)) {
+                myLocation = "Битола";
+                DBHandler db = new DBHandler(this);
+                br = db.getBrojoj(myLocation);
         }
-         if ((latituda <= 41.08 && latituda >= 40.98) && (longituda <= 21.38 && longituda >= 21.28)) {
-             myLocation = "Битола";
-             DBHandler db = new DBHandler(this);
-             Info info = db.getInfo(myLocation);
-             brojoj = new String[]{info.getBroj()};
-        }
-
 
 
         //I make a log to see the results
         TextView labela = (TextView) findViewById(R.id.textView);
         labela.setText(myLocation);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, brojoj);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, br);
 
         ListView list = (ListView) findViewById(R.id.listViewMain);
         list.setAdapter(adapter);
-
     }
-
     private void registerClickCallback() {
         ListView list= (ListView) findViewById(R.id.listViewMain);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -126,10 +126,9 @@ public class MainActivity extends AppCompatActivity {
         populateListView();
         registerClickCallback();
     }
-
-
     public void vnesNaPodatoci(){
         DBHandler db = new DBHandler(this);
+
         //prvo vnesuvam deka ima bazata podatoci
         db.addInfo(new Info("1", "1", "1", "1"));
         //insert prilep
@@ -145,5 +144,6 @@ public class MainActivity extends AppCompatActivity {
         db.addInfo(new Info("108", "Битола", "Фаворит", "1591"));
         db.addInfo(new Info("109", "Битола", "Пелфи", "1593"));
         db.addInfo(new Info("110", "Битола", "Алфа", "1595"));
+
     }
 }

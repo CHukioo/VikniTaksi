@@ -5,7 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Marko on 4/4/2016.
@@ -14,7 +17,7 @@ public class DBHandler extends SQLiteOpenHelper{
 
 
     // Database Version
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     // Database Name
     private static final String DATABASE_NAME = "taxi_db";
     // Contacts table name
@@ -64,16 +67,33 @@ public class DBHandler extends SQLiteOpenHelper{
     }
 
     // Getting one shop
-    public Info getInfo(String ime) {
+    public Info getInfo(String grad) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_INFO, new String[] { KEY_ID,
                         KEY_GRAD, KEY_IME, KEY_BROJ }, KEY_IME + "=?",
-                new String[] { String.valueOf(ime) }, null, null, null, null);
+                new String[] { String.valueOf(grad) }, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
        // String info = cursor.getString(3);
        Info info = new Info(cursor.getString(0),cursor.getString(1), cursor.getString(2),cursor.getString(3));
 // return shop
         return info;
+    }
+
+    public ArrayList<String> getBrojoj(String grad) {
+        ArrayList<String> br = new ArrayList<>();
+    // Select All Query
+        String selectQuery = "SELECT broj FROM " + TABLE_INFO + " WHERE grad='"+ grad +"';";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+    // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                String broj = cursor.getString(cursor.getColumnIndex("broj"));
+                br.add(broj);
+            } while (cursor.moveToNext());
+        }
+    // return contact list
+        return br;
     }
 }
